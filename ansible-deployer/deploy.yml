@@ -1,0 +1,31 @@
+---
+- name: Re-Deploy application on all servers
+  hosts: all
+  become: yes
+
+  vars:
+    token_file: "token.txt"  # Local path to the AI_TOKEN file on your local machine
+    deploy_script: "/home/ubuntu/application/deploy.sh"  # Path to the deploy script on the instances
+
+  tasks:
+    - name: Copy token.txt to remote instance
+      copy:
+        src: "{{ token_file }}"
+        dest: "/home/ubuntu/application/token.txt"
+        owner: ubuntu
+        mode: '0600'
+
+    - name: Read AI_TOKEN from token file on remote instance
+      slurp:
+        src: "/home/ubuntu/application/token.txt"
+      register: token_content
+
+    - name: Decode AI_TOKEN from token file
+      set_fact:
+        ai_token: "{{ token_content.content | b64decode | trim }}"
+
+    - name: Run deploy.sh script on the target instance
+      shell: >
+        bash {{ deploy_script }} {{ ansible_host }} {{ ai_token }}
+      args:
+        chdir: "/home/ubuntu/application"

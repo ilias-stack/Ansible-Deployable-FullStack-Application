@@ -1,0 +1,238 @@
+<div class="h-full lg:w-2/3 mx-auto">
+  <div class="justify-between flex flex-col h-full">
+    @if (messages.length > 0) {
+      <div
+        class="flex flex-col h-full space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+        id="chatbox"
+      >
+        @for (message of messages; track $index) {
+          @if (!message.isQuestion) {
+            <div>
+              <div
+                class="flex items-end"
+                [class]="message.isBot ? '' : 'justify-end'"
+              >
+                <div
+                  class="flex flex-col space-y-2 text-md leading-tight max-w-lg mx-2"
+                  [class]="
+                    message.isBot ? 'order-2 items-start' : 'order-1 items-end'
+                  "
+                >
+                  <div>
+                    <span
+                      class="px-4 py-3 rounded-xl inline-block"
+                      [class]="
+                        message.isBot
+                          ? 'rounded-bl-none bg-gray-900 text-gray-100 border border-gray-600'
+                          : 'rounded-br-none bg-blue-500 text-white'
+                      "
+                    >
+                      {{ message.content }}
+                    </span>
+                  </div>
+                </div>
+                <div
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-900 border-2 border-gray-600"
+                  [class]="message.isBot ? '' : 'order-2'"
+                >
+                  <i
+                    [class]="
+                      message.isBot
+                        ? 'ri-robot-2-fill text-blue-500'
+                        : 'ri-user-fill'
+                    "
+                  ></i>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div>
+              <div class="flex items-end">
+                <div
+                  class="flex flex-col space-y-2 text-md leading-tight max-w-lg mx-2 order-2 items-start"
+                >
+                  <div>
+                    <span
+                      class="px-4 py-3 rounded-xl inline-block rounded-bl-none bg-gray-900 text-gray-100 border border-gray-600"
+                    >
+                      {{ message.question }}
+                    </span>
+                    <ul class="w-48 text-sm font-medium text-whiterounded-lg">
+                      @for (item of message.answers; track $index) {
+                        <li class="w-full rounded-t-lg">
+                          <div class="flex items-center ps-3">
+                            <input
+                              [id]="'list-radio-' + $index"
+                              type="radio"
+                              [value]="item.correct"
+                              name="list-radio"
+                              (click)="selectAnswer(item)"
+                              class="w-4 h-4 text-blue-600 bg-gray-900 focus:ring-blue-500"
+                            />
+                            <label
+                              [for]="'list-radio-' + $index"
+                              class="w-full py-3 ms-2 text-sm font-medium text-white"
+                            >
+                              {{ item.text }}
+                            </label>
+                          </div>
+                        </li>
+                      }
+                      @if (answer !== null) {
+                        <div>
+                          {{ answer.text }}<br />
+                          <span
+                            [class]="{
+                              'text-green-500': answer.correct,
+                              'text-red-500': !answer.correct
+                            }"
+                          >
+                            Explication : {{ message.explication }}
+                          </span>
+                        </div>
+                      }
+                    </ul>
+                  </div>
+                </div>
+                <div
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-900 border-2 border-gray-600"
+                >
+                  <i class="ri-robot-2-fill text-blue-500"></i>
+                </div>
+              </div>
+            </div>
+          }
+        }
+        @if (loadingAnswer) {
+          <div class="flex items-end">
+            <div
+              class="flex flex-col space-y-2 text-md leading-tight mx-2 order-2 items-start"
+            >
+              <div>
+                <img
+                  src="https://support.signal.org/hc/article_attachments/360016877511/typing-animation-3x.gif"
+                  alt="..."
+                  class="w-16 ml-6"
+                />
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="flex items-center justify-center h-full">
+        <h1 class="text-3xl">Hello , How Can I help you today?</h1>
+      </div>
+    }
+    <div class="border-t-2 border-gray-600 pt-4 mb-2">
+      <div class="flex items-center rounded-lg flex-wrap md:flex-nowrap">
+        <div class="flex items-center mb-2 md:mb-0">
+          <button
+            id="dropdown-button"
+            data-dropdown-toggle="dropdown"
+            class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-100 bg-gray-900 border border-gray-600 rounded-s-lg hover:bg-gray-700"
+            type="button"
+          >
+            {{ assistant_name }}
+            <svg
+              class="w-2.5 h-2.5 ms-2.5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+          <div
+            id="dropdown"
+            class="z-10 hidden bg-gray-900 divide-y divide-gray-600 rounded-lg shadow w-44"
+          >
+            <ul
+              class="py-2 text-sm text-gray-100"
+              aria-labelledby="dropdown-button"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-800"
+                  (click)="switchToQuizMode()"
+                >
+                  Quiz
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-800"
+                  (click)="chooseAssistant(2)"
+                >
+                  Data Analyst
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-800"
+                  (click)="chooseAssistant(3)"
+                >
+                  Assistant
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="flex items-center justify-center h-full">
+            <div class="flex items-center justify-center w-full">
+              <label
+                for="dropzone-file"
+                class="flex flex-col items-center justify-center cursor-pointer bg-gray-900 border-y border-y-gray-600 px-3 py-2 rounded-e-lg md:rounded-none"
+              >
+                <div class="flex flex-col items-center justify-center">
+                  <i class="ri-attachment-line"></i>
+                </div>
+                <input
+                  id="dropzone-file"
+                  type="file"
+                  class="hidden"
+                  (change)="attachFile($event)"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <input
+          id="chat"
+          class="block p-2.5 w-full z-20 text-sm outline-none bg-gray-900 mb-2 md:mb-0 rounded-e-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500 rounded-lg md:rounded-s-none"
+          placeholder="Your message..."
+          [(ngModel)]="message"
+          (keyup.enter)="sendMessage()"
+        />
+        <div class="flex items-center">
+          <button
+            class="flex justify-center items-center py-3 px-4 mx-2 shrink-0 text-white rounded cursor-pointer bg-blue-500 hover:bg-blue-700 transition-all disabled:opacity-70 disabled:pointer-events-none"
+            [disabled]="
+              loadingAnswer ||
+              message.trim() === '' ||
+              (isQuizMode() && quizTopic !== null)
+            "
+            (click)="sendMessage()"
+          >
+            <i class="ri-send-plane-2-fill ri-lg"></i>
+          </button>
+          <button
+            class="flex justify-center items-center py-3 px-4 mx-2 shrink-0 text-white rounded cursor-pointer bg-blue-500 hover:bg-blue-700 transition-all"
+            (click)="startVoiceRecognition()"
+          >
+            <i class="ri-mic-fill ri-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

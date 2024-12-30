@@ -1,0 +1,43 @@
+---
+- name: Ensure Docker and Docker Compose Installed, Then Clone Repo
+  hosts: all
+  become: yes
+
+  vars:
+    repo_url: "https://github.com/ilias-stack/devops-application.git"  
+    clone_path: "/home/ubuntu/application"           
+
+  tasks:
+
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_check
+      ignore_errors: yes
+
+    - name: Abort if Docker is not installed
+      fail:
+        msg: "Docker is not installed. Please install Docker before proceeding."
+      when: docker_check.rc != 0
+
+    - name: Check if Docker Compose is installed
+      command: docker-compose --version
+      register: compose_check
+      ignore_errors: yes
+
+    - name: Abort if Docker Compose is not installed
+      fail:
+        msg: "Docker Compose is not installed. Please install Docker Compose before proceeding."
+      when: compose_check.rc != 0
+
+    - name: Clone Git repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ clone_path }}"
+        update: yes
+
+    - name: Set permissions to 777 for the cloned repository
+      file:
+        path: "{{ clone_path }}"
+        state: directory
+        mode: '0777'
+        recurse: yes

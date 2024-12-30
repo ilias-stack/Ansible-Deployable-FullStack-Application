@@ -1,0 +1,113 @@
+<div class="h-full overflow-auto">
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+  >
+    @for (model of models; track $index) {
+      <div class="bg-gray-900 border border-gray-600 rounded-lg shadow">
+        <div
+          class="cursor-pointer relative"
+          data-modal-target="view-3d-modal"
+          data-modal-toggle="view-3d-modal"
+          (click)="activeModel = model"
+        >
+          <img
+            class="rounded-t-lg h-[250px] w-full object-cover"
+            [src]="model.thumbnail"
+            alt=""
+          />
+          <div
+            class="absolute top-0 left-0 bottom-0 right-0 h-full w-full items-center flex justify-center bg-[#00000080] opacity-0 hover:opacity-100 transition-opacity duration-300"
+          >
+            <i class="ri-play-fill text-4xl text-white"></i>
+          </div>
+        </div>
+        <div class="p-5">
+          <h5 class="text-lg font-medium" [title]="model.title">
+            {{ truncate(model.title, 30) }}
+          </h5>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<div
+  id="view-3d-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+  <div class="relative w-full max-w-7xl max-h-full">
+    <!-- Modal content -->
+    <div class="relative bg-gray-900 rounded-lg shadow">
+      <!-- Modal header -->
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
+      >
+        <h3 class="text-xl font-semibold">
+          {{ activeModel.title }}
+        </h3>
+        <button
+          type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+          data-modal-hide="view-3d-modal"
+        >
+          <svg
+            class="w-3 h-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+            />
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-4 md:p-5 space-y-4">
+        <iframe
+          title="Bicuspid Aortic Valve 3D model - Sketchfab"
+          [src]="getEmbedUrl(activeModel.sketchfabID) | safe: 'resourceUrl'"
+          id="api-frame"
+          allow="autoplay; fullscreen; xr-spatial-tracking"
+          xr-spatial-tracking="true"
+          execution-while-out-of-viewport="true"
+          execution-while-not-rendered="true"
+          web-share="true"
+          allowfullscreen=""
+          style="width: 100%; height: 600px"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <iframe
+  title="A 3D model"
+  src="https://sketchfab.com/models/d3fda2a0b8d24a04b7bc4ce2d7827480/embed"
+  allow="autoplay; fullscreen; vr"
+  mozallowfullscreen="true"
+  webkitallowfullscreen="true"
+  width="320"
+  height="240"
+  frameborder="0"
+></iframe> -->
+<!-- 
+<iframe
+  title="Bicuspid Aortic Valve 3D model - Sketchfab"
+  src="https://sketchfab.com/models/d3fda2a0b8d24a04b7bc4ce2d7827480/embed?autostart=1&amp;internal=1&amp;tracking=0&amp;ui_ar=0&amp;ui_infos=0&amp;ui_snapshots=1&amp;ui_stop=0&amp;ui_theatre=1&amp;ui_watermark=0"
+  id="api-frame"
+  allow="autoplay; fullscreen; xr-spatial-tracking"
+  xr-spatial-tracking="true"
+  execution-while-out-of-viewport="true"
+  execution-while-not-rendered="true"
+  web-share="true"
+  allowfullscreen=""
+></iframe> -->

@@ -1,0 +1,8 @@
+all:
+  hosts:
+    server1:
+      ansible_host: 84.8.115.202
+      ansible_user: ubuntu
+    server2:
+      ansible_host: 84.8.96.90
+      ansible_user: ubuntu
